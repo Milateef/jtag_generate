@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser(formatter_class=CustomerFormatter,
     '''))
 
 parser.add_argument('outfile', action='store', type=argparse.FileType('w'),
-    help='path to the VCD file to write to')
+    help='path to the VCD file to create')
 
 my_args = parser.parse_args()
 
