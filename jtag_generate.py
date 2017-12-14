@@ -57,28 +57,28 @@ with VCDWriter(my_args.outfile, timescale='1 ns', date='today') as writer:
         for v in values:
             step = clock_signal(tms_v, step, v)
         return step
-        
+
     def tdi(step, values):
         "s is the current step, v is the list of values"
         assert len(values) != 0, "An empty list of values was passed as parameter"
 
         # first step => clear TMS
         writer.change(tms_v, step, 0)
-        
+
         for v in values[:-1]:
             step = clock_signal(tdi_v, step, v)
 
         # last step => set TMS
         step = clock_signals([tdi_v, tms_v], step, [values[-1], 1])
         return step
-    
+
     def tdo(step, values):
         "s is the current step, v is the list of values"
         assert(len(values) != 0)
-        
+
         # first step => clear TMS
         writer.change(tms_v, step, 0)
-            
+
         for v in values[:-1]:
             step = clock_signal(tdo_v, step, v)
 
@@ -88,17 +88,17 @@ with VCDWriter(my_args.outfile, timescale='1 ns', date='today') as writer:
 
     # go to reset mode and directly to run test idle (5 ones should be enough)
     step = tms(step, "1"*5 + "0")
-    # go to shift instruction
-    step = tms(step, "1100")
-    # send instruction IDCODE = 4
-    step = tdi(step, '{0:08b}'.format(4))
-    # go to shift data
-    step = tms(step, "1100")
-    # read out IDCODE
-    step = tdo(step, '{0:032b}'.format(0x15A083))
-    # go to test idle
-    step = tms(step, "10")
-    
+    for i in range(100):
+        # go to shift instruction
+        step = tms(step, "1100")
+        # send instruction IDCODE = 4
+        step = tdi(step, '{0:08b}'.format(4))
+        # go to shift data
+        step = tms(step, "1100")
+        # read out IDCODE
+        step = tdo(step, '{0:032b}'.format(i))
+        # go to test idle
+        step = tms(step, "10")
 
 my_args.outfile.close()
 
